@@ -40,16 +40,19 @@ TagManager:
   m_SortingLayers:
   - name: Background
     uniqueID: 2466051403
-    locked: 0
+    locked: 1
   - name: Muntiain
     uniqueID: 2056659163
-    locked: 0
+    locked: 1
   - name: Treeline
     uniqueID: 2508155147
-    locked: 0
+    locked: 1
   - name: Foreground
     uniqueID: 3730377961
     locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Player
+    uniqueID: 367578381
     locked: 0
