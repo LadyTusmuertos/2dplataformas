@@ -12,20 +12,36 @@ public class CharacterController2D : MonoBehaviour {
     public ControllerParameters2D DefaultParameters;
 
     public ControllerState2D State { get; private set; }
+    public Vector2 Velocity { get { return _velocity; } }
+    public bool CanJump{get { return false; }}
+
+    private Vector2 _velocity;
+    private Transform _transform;
+    private Vector3 _localScale;
+    private BoxCollider2D _boxCollider;
+
+    private float
+        _verticalDistanceBetweenRays, 
+        _horizontalDistanceBetweenRays;
 
     public void Awake() {
+        State = new ControllerState2D();
     }
 
     public void AddForce(Vector2 force) {
+        _velocity = force;
     }
 
     public void SetForce(Vector2 force) {
+        _velocity += force;
     }
 
     public void SetHorizontalForce(float x){
+        _velocity.x = x;
     }
 
-    public void SetVerticalForce(float x){
+    public void SetVerticalForce(float y){
+        _velocity.y = y;
     }
 
     public void Jump(){
