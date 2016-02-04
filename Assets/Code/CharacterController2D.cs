@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class CharacterContoller2D : MonoBehaviour {
+public class CharacterController2D : MonoBehaviour {
 
     private const float SkinWidth = .02f;
     private const int TotalHorizontalRays = 8;
