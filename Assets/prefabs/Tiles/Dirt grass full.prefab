@@ -9,7 +9,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 421718}
   - 212: {fileID: 21293998}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Big dirt (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24,7 +24,8 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 499438}
-  m_Layer: 0
+  - 61: {fileID: 6155504}
+  m_Layer: 8
   m_Name: Dirt grass full
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +41,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 479210}
   - 212: {fileID: 21284500}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Grass 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -78,13 +79,27 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 142616}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.81, y: 0, z: 0}
+  m_LocalPosition: {x: -1.0371962, y: -16.93206, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 421718}
   - {fileID: 479210}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!61 &6155504
+BoxCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 142616}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_Offset: {x: 1.9160925, y: 1.9216661}
+  serializedVersion: 2
+  m_Size: {x: 3.82958, y: 3.8630009}
 --- !u!212 &21284500
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -151,7 +166,11 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 142616}

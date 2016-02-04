@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class Charactercontoller2D : MonoBehaviour {
+public class CharacterContoller2D : MonoBehaviour {
 
     private const float SkinWidth = .02f;
     private const int TotalHorizontalRays = 8;

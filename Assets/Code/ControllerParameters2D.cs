@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System.Collections;
-using System
+﻿using System;
+using UnityEngine;
+
 
 [Serializable]
-
 public class ControllerParameters2D  {
 
     public enum JumpBehavior {
