@@ -15,8 +15,19 @@ public class CharacterController2D : MonoBehaviour {
     //PROPIEDADES
     public ControllerState2D State { get; private set; }
     public Vector2 Velocity { get { return _velocity; } }
-    public bool CanJump {get { return false; } }
+    
     public bool HandleCollisions { get; set; }
+    public GameObject StandingOn { get; private set; }
+
+    public bool CanJump {
+        get {
+            if (Parameters.JumpRestrictions == ControllerParameters2D.JumpBehavior.CanJumpAnywhere)
+                return _jumpIn <= 0;
+            if (Parameters.JumpRestrictions == ControllerParameters2D.JumpBehavior.CanJumpOnGround)
+                return State.IsGrounded;
+            return false;
+        }
+    }
 
     // operador a ?? b : devuelve a si no es vacio, si no devuelve b 
     public ControllerParameters2D Parameters { get { return _overrideParameters ?? DefaultParameters; } }
@@ -26,6 +37,7 @@ public class CharacterController2D : MonoBehaviour {
     private Vector3 _localScale;
     private BoxCollider2D _boxCollider;
     private ControllerParameters2D _overrideParameters;
+    private float _jumpIn;
 
     private Vector3 _raycastTopLeft;
     private Vector3 _raycastBottomRight;
@@ -66,9 +78,16 @@ public class CharacterController2D : MonoBehaviour {
     }
 
     public void Jump(){
+        AddForce(new Vector2(0, Parameters.JumpMagnitude));
+        _jumpIn = Parameters.JumpFrequency;
+
+
     }
 
     public void LateUpdate() {
+        _jumpIn -= Time.deltaTime;
+
+        _velocity.y += Parameters.Gravity * Time.deltaTime;
         Move(Velocity * Time.deltaTime);
     }
 
@@ -145,6 +164,49 @@ public class CharacterController2D : MonoBehaviour {
     }
 
     private void MoveVertically(ref Vector2 deltaMovement) {
+        var isGoingUp = deltaMovement.y > 0;
+        var rayDistance = Mathf.Abs(deltaMovement.y) + SkinWidth;
+        var rayDirection = isGoingUp ? Vector2.up : -Vector2.up;
+        var rayOrigin = isGoingUp ? _raycastTopLeft : _raycastBottomLeft;
+
+        rayOrigin.x += deltaMovement.x;
+
+        var standingOnDistance = float.MaxValue;
+
+        for (int i = 0; i < TotalVerticalRays; ++i){
+            var rayVector = new Vector2(rayOrigin.x + (i * _horizontalDistanceBetweenRays), rayOrigin.y);
+            Debug.DrawRay(rayVector, rayDirection * rayDistance, Color.blue);
+
+            var raycastHit = Physics2D.Raycast(rayVector, rayDirection, rayDistance, PlatformMask);
+            if (!raycastHit)
+                continue;
+
+            if (!isGoingUp) {
+                var verticalDistanceToHit = _transform.position.y - raycastHit.point.y;
+                if (verticalDistanceToHit < standingOnDistance) {
+                    standingOnDistance = verticalDistanceToHit;
+                    StandingOn = raycastHit.collider.gameObject;
+                }
+            }
+
+            deltaMovement.y = raycastHit.point.y - rayVector.y;
+            rayDistance = Mathf.Abs(deltaMovement.y);
+
+            if (isGoingUp) {
+                deltaMovement.y -= SkinWidth;
+                State.IsCollidingAbove = true;
+            }
+            else {
+                deltaMovement.y += SkinWidth;
+                State.IsCollidingBelow = true;
+            }
+
+            if (!isGoingUp && deltaMovement.y > .0001f)
+                State.IsMovingUpSlope = true;
+            if (rayDistance < SkinWidth + .0001f)
+                break;
+        }
+
     }
 
     private void HandleVerticalSlope(ref Vector2 deltaMovement) {
