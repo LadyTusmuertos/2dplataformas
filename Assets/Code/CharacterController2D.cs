@@ -18,7 +18,7 @@ public class CharacterController2D : MonoBehaviour {
     
     public bool HandleCollisions { get; set; }
     public GameObject StandingOn { get; private set; }
-
+    public Vector3 PlatformVelocity { get; private set; }
     public bool CanJump {
         get {
             if (Parameters.JumpRestrictions == ControllerParameters2D.JumpBehavior.CanJumpAnywhere)
@@ -32,12 +32,18 @@ public class CharacterController2D : MonoBehaviour {
     // operador a ?? b : devuelve a si no es vacio, si no devuelve b 
     public ControllerParameters2D Parameters { get { return _overrideParameters ?? DefaultParameters; } }
 
+
+    //CAMPOS
     private Vector2 _velocity;
     private Transform _transform;
     private Vector3 _localScale;
     private BoxCollider2D _boxCollider;
     private ControllerParameters2D _overrideParameters;
     private float _jumpIn;
+    private GameObject _lastStandingOn;
+
+    private Vector3 _activeLocalPlatformPoint;
+    private Vector3 _activeGlobalPlatformPoint;
 
     private Vector3 _raycastTopLeft;
     private Vector3 _raycastBottomRight;
@@ -47,6 +53,8 @@ public class CharacterController2D : MonoBehaviour {
         _verticalDistanceBetweenRays, 
         _horizontalDistanceBetweenRays;
 
+
+    // METODOS
     public void Awake() {
         HandleCollisions = true;
         State = new ControllerState2D();
@@ -80,8 +88,6 @@ public class CharacterController2D : MonoBehaviour {
     public void Jump(){
         AddForce(new Vector2(0, Parameters.JumpMagnitude));
         _jumpIn = Parameters.JumpFrequency;
-
-
     }
 
     public void LateUpdate() {
@@ -105,6 +111,7 @@ public class CharacterController2D : MonoBehaviour {
                 MoveHorizontally(ref deltaMovement);
 
             MoveVertically(ref deltaMovement);
+
         }
 
         _transform.Translate(deltaMovement, Space.World);
@@ -116,9 +123,49 @@ public class CharacterController2D : MonoBehaviour {
 
         _velocity.x = Mathf.Min(_velocity.x, Parameters.MaxVelocity.x);
         _velocity.y = Mathf.Min(_velocity.y, Parameters.MaxVelocity.y);
+
+        if (State.IsMovingUpSlope)
+            _velocity.y = 0;
+        if(StandingOn != null)
+        {
+            _activeGlobalPlatformPoint = transform.position;
+            _activeLocalPlatformPoint = StandingOn.transform.InverseTransformPoint(transform.position);
+
+            if (_lastStandingOn != StandingOn)
+            {
+                if (_lastStandingOn != null)
+                    _lastStandingOn.SendMessage("ControllerExit2D", this, SendMessageOptions.DontRequireReceiver);
+
+                StandingOn.SendMessage("ControllerEnter2D", this, SendMessageOptions.DontRequireReceiver);
+                _lastStandingOn = StandingOn;
+            }
+            else if (StandingOn != null)
+                StandingOn.SendMessage("ControllerStay2D", this, SendMessageOptions.DontRequireReceiver);
+           }
+        else if(_lastStandingOn != null)
+        {
+            _lastStandingOn.SendMessage("ControllerExit2D", this, SendMessageOptions.DontRequireReceiver);
+            _lastStandingOn = null;
+        }
     }
 
     private void HandlePlatforms() {
+        if (StandingOn != null)
+        {
+            
+            var newGlobalPlatformPoint = StandingOn.transform.TransformPoint(_activeLocalPlatformPoint);
+            var moveDistance = newGlobalPlatformPoint - _activeGlobalPlatformPoint;
+
+            if (moveDistance != Vector3.zero)
+                transform.Translate(moveDistance, Space.World);
+
+            PlatformVelocity = (newGlobalPlatformPoint - _activeGlobalPlatformPoint) / Time.deltaTime;
+        }
+        else
+            PlatformVelocity = Vector3.zero;
+
+        StandingOn = null;
+
     }
 
     private void CalculateRayOrigins() {
@@ -130,7 +177,8 @@ public class CharacterController2D : MonoBehaviour {
         _raycastBottomLeft = _transform.position + new Vector3(center.x - size.x + SkinWidth, center.y - size.y + SkinWidth);
     }
 
-    private void MoveHorizontally(ref Vector2 deltaMovement) {
+    private void MoveHorizontally(ref Vector2 deltaMovement)
+    {
         var isGoingRight = deltaMovement.x > 0;
         var rayDistance = Mathf.Abs(deltaMovement.x) + SkinWidth;
         var rayDirection = isGoingRight ? Vector2.right : -Vector2.right;
