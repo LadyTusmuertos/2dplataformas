@@ -126,8 +126,8 @@ public class CharacterController2D : MonoBehaviour {
 
         if (State.IsMovingUpSlope)
             _velocity.y = 0;
-        if(StandingOn != null)
-        {
+        /////////////////////////////////////////// PREGUNTARLE A DIDAC ESTE CACHO DE CÓDIGO, A VER SI LE VE SENTIDO
+        if(StandingOn != null){
             _activeGlobalPlatformPoint = transform.position;
             _activeLocalPlatformPoint = StandingOn.transform.InverseTransformPoint(transform.position);
 
@@ -165,6 +165,17 @@ public class CharacterController2D : MonoBehaviour {
             PlatformVelocity = Vector3.zero;
 
         StandingOn = null;
+
+    }
+
+    private void CorrectHorizontalPlacement(ref Vector2 deltaMovement, bool isRight) {
+        var halfWidht = (_boxCollider.size.x * _localScale.x) / 2f;
+        var rayOrigin = isRight ? _raycastBottomRight : _raycastBottomLeft;
+
+        if (isRight){
+            // faltan cosas
+
+        }
 
     }
 

@@ -9,6 +9,5 @@ public class JumpPlatforms : MonoBehaviour {
     public void ControllerEnter2D (CharacterController2D controller)
     {
         controller.SetVerticalForce(JumpMagnitude);
-        Debug.LogWarning("no rula");
     }
 }
