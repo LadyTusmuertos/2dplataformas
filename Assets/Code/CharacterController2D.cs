@@ -167,7 +167,7 @@ public class CharacterController2D : MonoBehaviour {
         StandingOn = null;
 
     }
-
+    //VIDEO 13 ; 14:54
     private void CorrectHorizontalPlacement(ref Vector2 deltaMovement, bool isRight) {
         var halfWidht = (_boxCollider.size.x * _localScale.x) / 2f;
         var rayOrigin = isRight ? _raycastBottomRight : _raycastBottomLeft;
