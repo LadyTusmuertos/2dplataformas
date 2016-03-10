@@ -112,6 +112,9 @@ public class CharacterController2D : MonoBehaviour {
 
             MoveVertically(ref deltaMovement);
 
+            CorrectHorizontalPlacement(ref deltaMovement, true);
+            CorrectHorizontalPlacement(ref deltaMovement, false);
+
         }
 
         _transform.Translate(deltaMovement, Space.World);
@@ -133,18 +136,18 @@ public class CharacterController2D : MonoBehaviour {
 
             if (_lastStandingOn != StandingOn)
             {
-                if (_lastStandingOn != null)
-                    _lastStandingOn.SendMessage("ControllerExit2D", this, SendMessageOptions.DontRequireReceiver);
+             //   if (_lastStandingOn != null)
+               //     _lastStandingOn.SendMessage("ControllerExit2D", this, SendMessageOptions.DontRequireReceiver);
 
                 StandingOn.SendMessage("ControllerEnter2D", this, SendMessageOptions.DontRequireReceiver);
                 _lastStandingOn = StandingOn;
             }
-            else if (StandingOn != null)
-                StandingOn.SendMessage("ControllerStay2D", this, SendMessageOptions.DontRequireReceiver);
+           // else if (StandingOn != null)
+             //   StandingOn.SendMessage("ControllerStay2D", this, SendMessageOptions.DontRequireReceiver);
            }
         else if(_lastStandingOn != null)
         {
-            _lastStandingOn.SendMessage("ControllerExit2D", this, SendMessageOptions.DontRequireReceiver);
+          //  _lastStandingOn.SendMessage("ControllerExit2D", this, SendMessageOptions.DontRequireReceiver);
             _lastStandingOn = null;
         }
     }
@@ -173,10 +176,20 @@ public class CharacterController2D : MonoBehaviour {
         var rayOrigin = isRight ? _raycastBottomRight : _raycastBottomLeft;
 
         if (isRight){
-            // faltan cosas
+            rayOrigin.x -= (halfWidht - SkinWidth);
 
         }
+        else {
+            rayOrigin.x += (halfWidht - SkinWidth);
+        }
+        var rayDirection = isRight ? Vector2.right : -Vector2.right;
 
+        var offset = 0f;
+
+        for(int i = 1; i < TotalHorizontalRays -1; ++i){
+            var rayVector = new Vector2(deltaMovement.x + rayOrigin.x, deltaMovement.y + rayOrigin.y + (i * _verticalDistanceBetweenRays));
+            Debug.DrawRay(rayVector, rayDirection * halfWidht, isRight ? Color.cyan : Color.magenta);
+        }
     }
 
     private void CalculateRayOrigins() {
